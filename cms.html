@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>記事管理 | 出会えるエージェント 編集部</title>
+  <style>
+    :root {
+      --green: #22c55e;
+      --green-light: #f0fdf4;
+      --green-dark: #15803d;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #3b82f6;
+      --gold: #f59e0b;
+      --silver: #9ca3af;
+      --bronze: #d97706;
+      --orange: #f97316;
+      --purple: #8b5cf6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      color: white;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    header h1 span.badge {
+      background: rgba(255,255,255,0.2);
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .toolbar {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .toolbar .stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-right: auto;
+    }
+
+    .toolbar .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .toolbar .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--green-dark);
+    }
+
+    .toolbar .stat-label {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .toolbar .view-toggle {
+      display: flex;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .toolbar .view-toggle button {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: white;
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      transition: all 0.15s;
+    }
+
+    .toolbar .view-toggle button.active {
+      background: var(--green);
+      color: white;
+    }
+
+    .toolbar .view-toggle button:hover:not(.active) {
+      background: var(--gray-100);
+    }
+
+    .filter-bar {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0.75rem 2rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar button {
+      padding: 0.4rem 1rem;
+      border: 1px solid var(--gray-300);
+      border-radius: 20px;
+      background: white;
+      cursor: pointer;
+      font-size: 0.8125rem;
+      color: var(--gray-600);
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+
+    .filter-bar button.active {
+      border-color: var(--green);
+      background: var(--green-light);
+      color: var(--green-dark);
+    }
+
+    .filter-bar button.active-popular {
+      border-color: var(--orange);
+      background: #fff7ed;
+      color: #c2410c;
+    }
+
+    .filter-bar button.active-pinned {
+      border-color: var(--blue);
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .filter-bar button:hover:not(.active):not(.active-popular):not(.active-pinned) {
+      border-color: var(--gray-400);
+      background: var(--gray-100);
+    }
+
+    .filter-bar .separator {
+      width: 1px;
+      background: var(--gray-200);
+      margin: 0 0.25rem;
+    }
+
+    /* Featured TOP3 Section */
+    .featured-section {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%);
+      border-bottom: 2px solid var(--gray-200);
+      padding: 2rem 2rem 2.5rem;
+    }
+
+    .featured-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .featured-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .featured-header h2 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--green-dark);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .featured-header .auto-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--gray-500);
+      background: var(--gray-100);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .featured-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: box-shadow 0.2s, transform 0.2s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .featured-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      transform: translateY(-3px);
+    }
+
+    .featured-card .rank-badge {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      color: white;
+      z-index: 2;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .featured-card .rank-badge.rank-1 {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+    .featured-card .rank-badge.rank-2 {
+      background: linear-gradient(135deg, #9ca3af, #6b7280);
+    }
+    .featured-card .rank-badge.rank-3 {
+      background: linear-gradient(135deg, #d97706, #b45309);
+    }
+
+    .featured-card .new-label {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: var(--red);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      z-index: 2;
+      letter-spacing: 0.05em;
+    }
+
+    .featured-card .feat-thumb-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--gray-100);
+      overflow: hidden;
+    }
+
+    .featured-card .feat-thumb-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .featured-card .feat-thumb-wrapper .no-thumb {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-400);
+      font-size: 0.875rem;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .featured-card .feat-body {
+      padding: 1rem 1.25rem;
+    }
+
+    .featured-card .feat-body h3 {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .featured-card .feat-body .feat-desc {
+      font-size: 0.8125rem;
+      color: var(--gray-500);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .featured-card .feat-body .feat-meta {
+      font-size: 0.75rem;
+      color: var(--gray-400);
+      margin-top: 0.5rem;
+    }
+
+    .featured-card .feat-body .feat-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    .featured-card .feat-body .feat-actions a {
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .featured-card .feat-body .feat-actions a.primary {
+      background: var(--green);
+      color: white;
+    }
+
+    .featured-card .feat-body .feat-actions a.primary:hover {
+      background: var(--green-dark);
+    }
+
+    .featured-card .feat-body .feat-actions a.secondary {
+      background: var(--gray-100);
+      color: var(--gray-600);
+    }
+
+    .featured-card .feat-body .feat-actions a.secondary:hover {
+      background: var(--gray-200);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--gray-800);
+      color: white;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      z-index: 300;
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(20px); }
+    }
+
+    main {
+      padding: 1.5rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .grid-view {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .list-view {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      transition: box-shadow 0.2s, transform 0.2s;
+      cursor: default;
+      position: relative;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+
+    .card.is-pinned {
+      border: 2px solid var(--blue);
+    }
+
+    .card.is-popular {
+      border: 2px solid var(--orange);
+    }
+
+    .card.is-pinned.is-popular {
+      border: 2px solid var(--purple);
+    }
+
+    .card .thumbnail-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--gray-100);
+      overflow: hidden;
+    }
+
+    .card .thumbnail-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card .thumbnail-wrapper .no-thumb {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-400);
+      font-size: 0.875rem;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .card .thumbnail-wrapper .no-thumb svg {
+      width: 36px;
+      height: 36px;
+      opacity: 0.5;
+    }
+
+    .card .thumbnail-wrapper .status-badge {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .card .thumbnail-wrapper .status-badge.published {
+      background: rgba(34, 197, 94, 0.9);
+      color: white;
+    }
+
+    .card .thumbnail-wrapper .status-badge.draft {
+      background: rgba(245, 158, 11, 0.9);
+      color: white;
+    }
+
+    .card .thumbnail-wrapper .thumb-indicator {
+      position: absolute;
+      bottom: 0.5rem;
+      left: 0.5rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+
+    .card .thumbnail-wrapper .thumb-indicator.has-thumb {
+      background: rgba(34, 197, 94, 0.9);
+      color: white;
+    }
+
+    .card .thumbnail-wrapper .thumb-indicator.no-thumb-badge {
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+    }
+
+    /* Card overlay badges */
+    .card .card-badges {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      display: flex;
+      gap: 0.375rem;
+      z-index: 3;
+    }
+
+    .card .card-badges .badge-item {
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .card .card-badges .badge-popular {
+      background: rgba(249, 115, 22, 0.9);
+    }
+
+    .card .card-badges .badge-pinned {
+      background: rgba(59, 130, 246, 0.9);
+    }
+
+    .card .card-body {
+      padding: 1rem;
+    }
+
+    .card .card-body h3 {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 0.5rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card .card-body .meta {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    .card .card-body .meta span {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .card .card-body .tags {
+      display: flex;
+      gap: 0.375rem;
+      flex-wrap: wrap;
+    }
+
+    .card .card-body .tags span {
+      padding: 0.15rem 0.5rem;
+      background: var(--gray-100);
+      border-radius: 4px;
+      font-size: 0.7rem;
+      color: var(--gray-600);
+    }
+
+    .card .card-body .description {
+      font-size: 0.8125rem;
+      color: var(--gray-500);
+      margin-top: 0.5rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card .card-body .actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--gray-100);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .card .card-body .actions a {
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .card .card-body .actions a.primary {
+      background: var(--green);
+      color: white;
+    }
+
+    .card .card-body .actions a.primary:hover {
+      background: var(--green-dark);
+    }
+
+    .card .card-body .actions a.secondary {
+      background: var(--gray-100);
+      color: var(--gray-600);
+    }
+
+    .card .card-body .actions a.secondary:hover {
+      background: var(--gray-200);
+    }
+
+    .actions .spacer {
+      flex: 1;
+    }
+
+    .toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--gray-300);
+      background: white;
+      color: var(--gray-500);
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .toggle-btn:hover {
+      border-color: var(--gray-400);
+      background: var(--gray-50);
+    }
+
+    .toggle-btn.popular-active {
+      border-color: var(--orange);
+      background: #fff7ed;
+      color: #c2410c;
+    }
+
+    .toggle-btn.popular-active:hover {
+      background: #ffedd5;
+    }
+
+    .toggle-btn.pin-active {
+      border-color: var(--blue);
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .toggle-btn.pin-active:hover {
+      background: #dbeafe;
+    }
+
+    .list-view .card {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .list-view .card .thumbnail-wrapper {
+      width: 200px;
+      min-width: 200px;
+      aspect-ratio: auto;
+      height: 120px;
+    }
+
+    .list-view .card .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .list-view .card .card-body h3 {
+      -webkit-line-clamp: 1;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--gray-400);
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    .modal h2 {
+      font-size: 1.125rem;
+      margin-bottom: 1rem;
+    }
+
+    .modal .thumb-preview {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .modal .close-btn {
+      float: right;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray-400);
+      padding: 0.25rem;
+    }
+
+    .modal .close-btn:hover {
+      color: var(--gray-700);
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 1rem; }
+      .toolbar { padding: 0.75rem 1rem; }
+      .filter-bar { padding: 0.5rem 1rem; }
+      main { padding: 1rem; }
+      .grid-view { grid-template-columns: 1fr; }
+      .list-view .card { flex-direction: column; }
+      .list-view .card .thumbnail-wrapper { width: 100%; height: auto; aspect-ratio: 16/9; }
+      .featured-section { padding: 1.25rem 1rem; }
+      .featured-grid { grid-template-columns: 1fr; }
+      .featured-header { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>
+      出会えるエージェント 編集部
+      <span class="badge">記事管理CMS</span>
+    </h1>
+  </header>
+
+  <div class="toolbar">
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-value" id="total-count">0</span>
+        <span class="stat-label">全記事</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="popular-count" style="color: var(--orange);">0</span>
+        <span class="stat-label">人気</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="pinned-count" style="color: var(--blue);">0</span>
+        <span class="stat-label">おすすめ</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="thumb-count">0</span>
+        <span class="stat-label">サムネあり</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="no-thumb-count" style="color: var(--red);">0</span>
+        <span class="stat-label">サムネなし</span>
+      </div>
+    </div>
+    <button onclick="resetAllSettings()" style="padding:0.4rem 0.75rem;border:1px solid var(--gray-300);border-radius:6px;background:white;cursor:pointer;font-size:0.75rem;color:var(--gray-500);" title="人気・おすすめをデフォルトに戻す">リセット</button>
+    <div class="view-toggle">
+      <button class="active" onclick="setView('grid')">グリッド</button>
+      <button onclick="setView('list')">リスト</button>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="active" onclick="setFilter('all', this)">すべて</button>
+    <button onclick="setFilter('popular', this)">🔥 人気</button>
+    <button onclick="setFilter('pinned', this)">📌 おすすめ</button>
+    <div class="separator"></div>
+    <button onclick="setFilter('has-thumb', this)">サムネあり</button>
+    <button onclick="setFilter('no-thumb', this)">サムネなし</button>
+    <div class="separator"></div>
+    <button onclick="setFilter('転職エージェント', this)">転職エージェント</button>
+    <button onclick="setFilter('面接対策', this)">面接対策</button>
+    <button onclick="setFilter('キャリア', this)">キャリア</button>
+    <button onclick="setFilter('年収・待遇', this)">年収・待遇</button>
+  </div>
+
+  <!-- 新着 TOP3 セクション (自動: 公開日順) -->
+  <section class="featured-section">
+    <div class="featured-inner">
+      <div class="featured-header">
+        <h2>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          新着 TOP3
+          <span class="auto-label">公開日順・自動</span>
+        </h2>
+      </div>
+      <div class="featured-grid" id="featured-container"></div>
+    </div>
+  </section>
+
+  <main>
+    <div id="article-container" class="grid-view"></div>
+  </main>
+
+  <!-- 記事詳細モーダル -->
+  <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+    <div class="modal">
+      <button class="close-btn" onclick="document.getElementById('modal').classList.remove('active')">&times;</button>
+      <h2 id="modal-title"></h2>
+      <img id="modal-thumb" class="thumb-preview" />
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <script>
+    const articles = [
+      {
+        file: "転職エージェント_複数登録_メリット.md",
+        title: "転職エージェントは複数登録すべき？併用のメリットと注意点",
+        description: "転職エージェントは1社だけでいい？複数登録のメリット・デメリットと、併用する際の注意点を経験者のデータをもとに解説します。",
+        category: "転職エージェント",
+        keyword: "転職エージェント 複数",
+        published: "2026-02-18",
+        thumbnail: "output/images/agent-multiple-registration-thumbnail.png",
+        cmsThumb: true,
+        cmsUrl: "https://deaeru-agent.jp/articles/article-mlsx5wc4-iafsdh",
+        popular: true
+      },
+      {
+        file: "転職エージェント_選び方.md",
+        title: "転職エージェントの選び方｜失敗しない5つのポイント",
+        description: "転職エージェント選びで失敗したくない方へ。自分に合うエージェントの見極め方と、効率的にベストパートナーを見つける方法を解説します。",
+        category: "転職・キャリア",
+        keyword: "転職エージェント 選び方",
+        published: "2026-02-18",
+        thumbnail: "output/images/agent-how-to-choose-5points-thumbnail.png",
+        cmsThumb: true,
+        cmsUrl: "https://deaeru-agent.jp/articles/5-n2xmx6",
+        cmsId: "49700b4c-ad0e-4bb7-b5b3-690c5bf5c53d",
+        popular: true
+      },
+      {
+        file: "転職エージェントおすすめ_10選.md",
+        title: "【2026年最新】転職エージェントおすすめ10選｜失敗しない選び方",
+        description: "2026年最新の転職エージェントおすすめ10選を厳選。各サービスの特徴・強みを比較し、あなたに最適なエージェントの選び方を解説します。",
+        category: "転職エージェント",
+        keyword: "転職エージェント おすすめ 10選",
+        published: "2026-02-21",
+        thumbnail: "output/images/agent-best-10-picks-thumbnail.png",
+        cmsThumb: true,
+        cmsUrl: "#",
+        popular: true
+      },
+      {
+        file: "転職エージェント_合わない_対処法.md",
+        title: "転職エージェントが合わないと感じたら｜担当変更・退会の判断基準と対処法",
+        description: "転職エージェントの担当者が合わないと感じている方へ。我慢すべきか変更すべきかの判断基準と、角を立てずに対処する方法を解説します。",
+        category: "転職エージェント",
+        keyword: "転職エージェント 合わない",
+        published: "2026-02-18",
+        thumbnail: "thumbnails/07-agent-awanai.png",
+        cmsThumb: true,
+        cmsUrl: "https://deaeru-agent.jp/articles/article-mlsx5tlh-qo518q"
+      },
+      {
+        file: "転職_面接対策_完全ガイド.md",
+        title: "転職面接で受かる人がやっている7つの準備｜よく聞かれる質問と回答例",
+        description: "転職の面接で落ちてしまう方へ。面接官が見ているポイントと、受かる人が実践している7つの準備を具体的な回答例つきで解説します。",
+        category: "面接対策",
+        keyword: "転職 面接対策",
+        published: "2026-02-18",
+        thumbnail: "output/images/agent-complete-guide-7points-thumbnail.png",
+        cmsThumb: true,
+        cmsUrl: "https://deaeru-agent.jp/articles/7-nzxhy0",
+        popular: true
+      },
+      {
+        file: "転職_自己分析_やり方.md",
+        title: "転職の自己分析のやり方｜強み・適職が見つかる4つのフレームワーク",
+        description: "転職で自己分析のやり方がわからない方へ。自分の強み・価値観・適職を見つけるための具体的なフレームワークと、プロに相談する方法を解説します。",
+        category: "キャリア",
+        keyword: "転職 自己分析 やり方",
+        published: "2026-02-18",
+        thumbnail: "thumbnails/03-jiko-bunseki.png",
+        cmsThumb: true,
+        cmsUrl: "https://deaeru-agent.jp/articles/4-y45bre"
+      },
+      {
+        file: "転職_書類選考_通過率アップ.md",
+        title: "転職の書類選考が通らない原因と通過率を上げる7つの改善ポイント",
+        description: "転職の書類選考で落ちてしまう方へ。採用担当者が見ているポイントと、通過率を上げるための職務経歴書・履歴書の書き方を具体例つきで解説します。",
+        category: "キャリア",
+        keyword: "転職 書類選考 通らない",
+        published: "2026-02-18",
+        thumbnail: "thumbnails/04-shorui-senko.png",
+        cmsThumb: true,
+        cmsUrl: "https://deaeru-agent.jp/articles/7-s7h86d",
+        cmsId: "ef212fde-b4b0-4cc9-8390-1aa370552057"
+      },
+      {
+        file: "転職_年収アップ_交渉術.md",
+        title: "転職で年収アップを実現する交渉術｜プロが教える5つのステップ",
+        description: "転職で年収を上げたい方へ。年収交渉のタイミング・伝え方・相場の調べ方を現場目線で解説。年収交渉を成功させる具体的な5ステップを紹介します。",
+        category: "年収・待遇",
+        keyword: "転職 年収アップ",
+        published: "2026-02-18",
+        thumbnail: "thumbnails/11-nenshu-up.png",
+        cmsThumb: true,
+        cmsUrl: "https://deaeru-agent.jp/articles/5-jpsp93",
+        cmsId: "1a8d19ef-dd62-4ea2-9fa9-067a77290652"
+      },
+      {
+        file: "転職_内定_複数_比較_選び方.md",
+        title: "転職で内定を複数もらったときの比較方法｜後悔しない選び方5つの基準",
+        description: "転職で内定が複数出て迷っている方へ。年収・仕事内容・社風など、後悔しない会社選びのための比較基準と判断のコツを解説します。",
+        category: "キャリア",
+        keyword: "転職 内定 複数 比較",
+        published: "2026-02-18",
+        thumbnail: "thumbnails/05-naitei-hikaku.png",
+        cmsThumb: true,
+        cmsUrl: "https://deaeru-agent.jp/articles/5-cqrtg8"
+      },
+      {
+        file: "初めて_転職_やり方_完全ガイド.md",
+        title: "初めての転職を成功させる完全ガイド｜準備から内定までの流れを解説",
+        description: "初めての転職で不安な方へ。何から始めればいいか、準備から内定・退職までの全ステップを時系列で解説。初転職でよくある失敗も紹介します。",
+        category: "転職・キャリア",
+        keyword: "初めて 転職 やり方",
+        published: "2026-02-18",
+        thumbnail: "thumbnails/02-hajimete-tenshoku.png",
+        cmsThumb: true,
+        cmsUrl: "https://deaeru-agent.jp/articles/article-mlsx5dfw-avgm59"
+      },
+      {
+        file: "円満退職_伝え方_タイミング.md",
+        title: "円満退職の伝え方とベストなタイミング｜トラブルを避ける退職マニュアル",
+        description: "退職を伝えるタイミングや上司への切り出し方で悩んでいる方へ。円満に会社を辞めるための手順・伝え方・引き止められたときの対処法を解説します。",
+        category: "キャリア",
+        keyword: "円満退職 伝え方",
+        published: "2026-02-18",
+        thumbnail: "thumbnails/01-enman-taishoku.png",
+        cmsThumb: true,
+        cmsUrl: "https://deaeru-agent.jp/articles/article-mlsx59zs-5p0jtm"
+      },
+      {
+        file: "転職エージェントおすすめ_20代.md",
+        title: "転職エージェントおすすめ5選｜20代・第二新卒向け",
+        description: "20代・第二新卒で転職エージェント選びに迷っている方へ。自分に合ったエージェントの選び方と、おすすめサービスを経験者目線で紹介します。",
+        category: "転職・キャリア",
+        keyword: "転職エージェント おすすめ",
+        published: "2026-02-14",
+        thumbnail: "output/images/agent-best-5-twenties-thumbnail.png",
+        cmsThumb: true,
+        cmsUrl: "https://deaeru-agent.jp/articles/520-gtqdha",
+        cmsId: "50eb208d-9d63-4463-abe6-8d865a22f78a",
+        popular: true
+      }
+    ];
+
+    let currentView = 'grid';
+    let currentFilter = 'all';
+
+    // --- 人気管理 (localStorage) ---
+    function getDefaultPopular() {
+      return new Set(articles.filter(a => a.popular).map(a => a.file));
+    }
+
+    function getPopularSet() {
+      try {
+        const saved = localStorage.getItem('cms_popular_articles');
+        if (saved) return new Set(JSON.parse(saved));
+      } catch(e) {}
+      return getDefaultPopular();
+    }
+
+    function initPopularIfNeeded() {
+      const saved = localStorage.getItem('cms_popular_articles');
+      if (!saved) {
+        savePopularSet(getDefaultPopular());
+        return;
+      }
+      try {
+        const parsed = JSON.parse(saved);
+        if (!Array.isArray(parsed) || parsed.length === 0) {
+          savePopularSet(getDefaultPopular());
+        }
+      } catch(e) {
+        savePopularSet(getDefaultPopular());
+      }
+    }
+
+    function resetAllSettings() {
+      localStorage.removeItem('cms_popular_articles');
+      localStorage.removeItem('cms_pinned_articles');
+      initPopularIfNeeded();
+      render();
+      renderFeatured();
+      showToast('設定をリセットしました');
+    }
+
+    function savePopularSet(s) {
+      localStorage.setItem('cms_popular_articles', JSON.stringify([...s]));
+    }
+
+    function togglePopular(file, evt) {
+      evt.stopPropagation();
+      const s = getPopularSet();
+      if (s.has(file)) {
+        s.delete(file);
+        showToast('人気を解除しました');
+      } else {
+        s.add(file);
+        showToast('🔥 人気に追加しました');
+      }
+      savePopularSet(s);
+      render();
+    }
+
+    // --- おすすめピン留め管理 (localStorage) ---
+    function getPinnedSet() {
+      try {
+        const saved = localStorage.getItem('cms_pinned_articles');
+        if (saved) return new Set(JSON.parse(saved));
+      } catch(e) {}
+      return new Set();
+    }
+
+    function savePinnedSet(s) {
+      localStorage.setItem('cms_pinned_articles', JSON.stringify([...s]));
+    }
+
+    function togglePinned(file, evt) {
+      evt.stopPropagation();
+      const s = getPinnedSet();
+      if (s.has(file)) {
+        s.delete(file);
+        showToast('おすすめピン留めを解除しました');
+      } else {
+        s.add(file);
+        showToast('📌 おすすめにピン留めしました');
+      }
+      savePinnedSet(s);
+      render();
+    }
+
+    // --- 新着TOP3 (公開日順で自動) ---
+    function getNewest3() {
+      return [...articles]
+        .sort((a, b) => new Date(b.published) - new Date(a.published))
+        .slice(0, 3);
+    }
+
+    function setView(view) {
+      currentView = view;
+      document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      render();
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-bar button').forEach(b => {
+        b.classList.remove('active', 'active-popular', 'active-pinned');
+      });
+      if (filter === 'popular') {
+        btn.classList.add('active-popular');
+      } else if (filter === 'pinned') {
+        btn.classList.add('active-pinned');
+      } else {
+        btn.classList.add('active');
+      }
+      render();
+    }
+
+    function closeModal(e) {
+      if (e.target === e.currentTarget) {
+        document.getElementById('modal').classList.remove('active');
+      }
+    }
+
+    function showDetail(idx) {
+      const a = articles[idx];
+      const popular = getPopularSet();
+      const pinned = getPinnedSet();
+      document.getElementById('modal-title').textContent = a.title;
+      const img = document.getElementById('modal-thumb');
+      img.src = a.thumbnail;
+      img.alt = a.title;
+
+      let statusHtml = '';
+      if (popular.has(a.file)) statusHtml += '<span style="color:#c2410c;font-weight:600;">🔥 人気</span> ';
+      if (pinned.has(a.file)) statusHtml += '<span style="color:#1d4ed8;font-weight:600;">📌 おすすめ</span>';
+
+      document.getElementById('modal-content').innerHTML = `
+        <p style="color:var(--gray-500);font-size:0.875rem;margin-bottom:1rem;">${a.description}</p>
+        ${statusHtml ? `<p style="margin-bottom:1rem;">${statusHtml}</p>` : ''}
+        <table style="width:100%;font-size:0.8125rem;border-collapse:collapse;">
+          <tr><td style="padding:0.5rem 0;color:var(--gray-500);width:120px;">カテゴリ</td><td style="padding:0.5rem 0;">${a.category}</td></tr>
+          <tr><td style="padding:0.5rem 0;color:var(--gray-500);">キーワード</td><td style="padding:0.5rem 0;">${a.keyword}</td></tr>
+          <tr><td style="padding:0.5rem 0;color:var(--gray-500);">公開日</td><td style="padding:0.5rem 0;">${a.published}</td></tr>
+          <tr><td style="padding:0.5rem 0;color:var(--gray-500);">ファイル</td><td style="padding:0.5rem 0;word-break:break-all;"><code>${a.file}</code></td></tr>
+          <tr><td style="padding:0.5rem 0;color:var(--gray-500);">サムネ(CMS)</td><td style="padding:0.5rem 0;">${a.cmsThumb ? '<span style="color:var(--green);">設定済み</span>' : '<span style="color:var(--red);">未設定</span>'}</td></tr>
+        </table>
+        <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+          <a href="${a.cmsUrl}" target="_blank" style="padding:0.5rem 1rem;background:var(--green);color:white;border-radius:6px;text-decoration:none;font-size:0.8125rem;">CMS記事を開く</a>
+        </div>
+      `;
+      document.getElementById('modal').classList.add('active');
+    }
+
+    function renderFeatured() {
+      const container = document.getElementById('featured-container');
+      const newest3 = getNewest3();
+      const today = new Date().toISOString().slice(0, 10);
+
+      container.innerHTML = newest3.map((a, i) => {
+        const realIdx = articles.indexOf(a);
+        const rankClass = `rank-${i + 1}`;
+        const isNew = a.published === today;
+        return `
+        <div class="featured-card" onclick="showDetail(${realIdx})">
+          <div class="rank-badge ${rankClass}">${i + 1}</div>
+          ${isNew ? '<div class="new-label">NEW</div>' : ''}
+          <div class="feat-thumb-wrapper">
+            <img src="${a.thumbnail}" alt="${a.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+            <div class="no-thumb" style="display:none;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="opacity:0.5;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21z"/></svg>
+              <span>画像なし</span>
+            </div>
+          </div>
+          <div class="feat-body">
+            <h3>${a.title}</h3>
+            <div class="feat-desc">${a.description}</div>
+            <div class="feat-meta">${a.published}　${a.category}</div>
+            <div class="feat-actions">
+              <a href="${a.cmsUrl}" target="_blank" class="primary" onclick="event.stopPropagation();">記事を開く</a>
+              <a href="output/${a.file}" target="_blank" class="secondary" onclick="event.stopPropagation();">MD表示</a>
+            </div>
+          </div>
+        </div>
+        `;
+      }).join('');
+    }
+
+    function showToast(message, isError) {
+      const existing = document.querySelector('.toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      if (isError) toast.style.background = 'var(--red)';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    function render() {
+      const container = document.getElementById('article-container');
+      container.className = currentView === 'grid' ? 'grid-view' : 'list-view';
+
+      const popular = getPopularSet();
+      const pinned = getPinnedSet();
+
+      let filtered = articles;
+      if (currentFilter === 'popular') {
+        filtered = articles.filter(a => popular.has(a.file));
+      } else if (currentFilter === 'pinned') {
+        filtered = articles.filter(a => pinned.has(a.file));
+      } else if (currentFilter === 'has-thumb') {
+        filtered = articles.filter(a => a.cmsThumb);
+      } else if (currentFilter === 'no-thumb') {
+        filtered = articles.filter(a => !a.cmsThumb);
+      } else if (currentFilter !== 'all') {
+        filtered = articles.filter(a => a.category.includes(currentFilter));
+      }
+
+      const totalCount = articles.length;
+      const thumbCount = articles.filter(a => a.cmsThumb).length;
+      const popularCount = articles.filter(a => popular.has(a.file)).length;
+      const pinnedCount = articles.filter(a => pinned.has(a.file)).length;
+      document.getElementById('total-count').textContent = totalCount;
+      document.getElementById('thumb-count').textContent = thumbCount;
+      document.getElementById('no-thumb-count').textContent = totalCount - thumbCount;
+      document.getElementById('popular-count').textContent = popularCount;
+      document.getElementById('pinned-count').textContent = pinnedCount;
+
+      if (filtered.length === 0) {
+        let emptyMsg = '該当する記事がありません';
+        let emptyHint = '';
+        if (currentFilter === 'popular') {
+          emptyMsg = '人気の記事がありません';
+          emptyHint = '<p style="font-size:0.8125rem;margin-top:0.5rem;">「すべて」タブに戻り、各カードの <strong>🔥 人気</strong> ボタンで記事を追加してください</p>';
+        } else if (currentFilter === 'pinned') {
+          emptyMsg = 'おすすめにピン留めされた記事がありません';
+          emptyHint = '<p style="font-size:0.8125rem;margin-top:0.5rem;">「すべて」タブに戻り、各カードの <strong>📌 おすすめ</strong> ボタンで記事をピン留めしてください</p>';
+        }
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+            <p>${emptyMsg}</p>
+            ${emptyHint}
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map((a) => {
+        const realIdx = articles.indexOf(a);
+        const isPop = popular.has(a.file);
+        const isPin = pinned.has(a.file);
+        const cardClasses = ['card'];
+        if (isPop) cardClasses.push('is-popular');
+        if (isPin) cardClasses.push('is-pinned');
+
+        let badgesHtml = '';
+        if (isPop || isPin) {
+          badgesHtml = '<div class="card-badges">';
+          if (isPop) badgesHtml += '<span class="badge-item badge-popular">🔥 人気</span>';
+          if (isPin) badgesHtml += '<span class="badge-item badge-pinned">📌 おすすめ</span>';
+          badgesHtml += '</div>';
+        }
+
+        return `
+        <div class="${cardClasses.join(' ')}" onclick="showDetail(${realIdx})">
+          <div class="thumbnail-wrapper">
+            ${badgesHtml}
+            <img src="${a.thumbnail}" alt="${a.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+            <div class="no-thumb" style="display:none;">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v13.5A1.5 1.5 0 003.75 21z"/></svg>
+              <span>画像なし</span>
+            </div>
+            <span class="status-badge published">公開中</span>
+            ${a.cmsThumb
+              ? '<span class="thumb-indicator has-thumb">CMS設定済み</span>'
+              : '<span class="thumb-indicator no-thumb-badge">CMS未設定</span>'
+            }
+          </div>
+          <div class="card-body">
+            <h3>${a.title}</h3>
+            <div class="meta">
+              <span>${a.published}</span>
+              <span>${a.category}</span>
+            </div>
+            <div class="tags">
+              ${a.keyword.split(/[, ]+/).map(k => `<span>#${k}</span>`).join('')}
+            </div>
+            <div class="description">${a.description}</div>
+            <div class="actions">
+              <a href="${a.cmsUrl}" target="_blank" class="primary" onclick="event.stopPropagation();">記事を開く</a>
+              <a href="output/${a.file}" target="_blank" class="secondary" onclick="event.stopPropagation();">MD表示</a>
+              <span class="spacer"></span>
+              <button class="toggle-btn ${isPop ? 'popular-active' : ''}" onclick="togglePopular('${a.file}', event)" title="${isPop ? '人気を解除' : '人気に追加'}">
+                🔥 ${isPop ? '人気' : '人気'}
+              </button>
+              <button class="toggle-btn ${isPin ? 'pin-active' : ''}" onclick="togglePinned('${a.file}', event)" title="${isPin ? 'おすすめ解除' : 'おすすめにピン留め'}">
+                📌 ${isPin ? 'おすすめ' : 'おすすめ'}
+              </button>
+            </div>
+          </div>
+        </div>
+        `;
+      }).join('');
+    }
+
+    initPopularIfNeeded();
+    render();
+    renderFeatured();
+  </script>
+</body>
+</html>
